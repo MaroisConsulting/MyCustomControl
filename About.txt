@@ -1,0 +1,19 @@
+First, thanks alot for your help. I've learned alot from you in the last few days.
+
+I took the things you showed me and created a dummy control to apply what I've learned. 
+The ultimate goal is to create a CustomControl and be able to give it to other developers, 
+and have them be able to restyle all or some of it.
+
+So, in the Generic.xaml I have the basic styles created. Then in the MainWindow I
+created (and commented out) some override styles. You can uncomment those & see
+the effect. That is (I think) what I'm looking for, the ability to restyle it -  
+I just want to be sure I'm going about this right.
+
+One other question I have - What if I wanted to create and ship two different styles,
+say Light and Dark. I assume I need two different style dictionaries that get applied
+in Generic.xaml, but I don't know what that looks like. Then, how can the end developer
+apply one of those?
+
+Again, thanks.
+
+Kevin
