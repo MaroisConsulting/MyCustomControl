@@ -4,6 +4,38 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
+
+  <!--<ItemGroup>
+    <Page Remove="Themes\Application.Dark.ThemeResources.xaml" />
+    <Page Remove="Themes\StyleOverrides\ClearButtonStyle.xaml" />
+    <Page Remove="Themes\Themes\LightThemes\Application.ThemeResources.xaml" />
+    <Page Remove="Themes\Themes\LightThemes\WackyWidget.ThemeResources.xaml" />
+    <Page Remove="Themes\WackyWidget.Dark.ThemeResources.xaml" />
+  </ItemGroup>-->
+
+  <!--<ItemGroup>
+    <Page Include="Themes\StyleOverrides\ClearButtonStyle.xaml" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <Folder Include="Themes\Themes\HighContrastThemes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyCustomControl.ThemeController\MyCustomControl.ThemeController.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Themes\Themes\DarkTemes\AnotherWackyWidget.Dark.ThemeResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Themes\Themes\DarkTemes\WackyWidget.Dark.ThemeResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+    </Page>
+  </ItemGroup>
 
 </Project>

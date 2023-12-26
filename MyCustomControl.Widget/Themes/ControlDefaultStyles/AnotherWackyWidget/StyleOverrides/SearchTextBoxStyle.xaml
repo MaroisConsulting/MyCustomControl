@@ -2,22 +2,15 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:MyCustomControl.Widget"
                     xmlns:themes="clr-namespace:MyCustomControl.ThemeController;assembly=MyCustomControl.ThemeController">
-
-  <ResourceDictionary.MergedDictionaries>
-
-    <ResourceDictionary Source="/MyCustomControl.Widget;component/Themes/ControlDefaultStyles/WackyWidget/WackyWidgetStyle.xaml" />
-    <ResourceDictionary Source="/MyCustomControl.Widget;component/Themes/ControlDefaultStyles/AnotherWackyWidget/AnotherWackyWidgetStyle.xaml" />
-    <!-- Provide the default/fallback theme -->
-    <!--<ResourceDictionary Source="/MyCustomControl.Widget;component/Themes/Themes/LightThemes/Application.Light.ThemeResources.xaml" />-->
-  </ResourceDictionary.MergedDictionaries>
-  <!--<Style TargetType="TextBox"
-         x:Key="{x:Static themes:ResourceKeys.SearchBoxStyleKey}">
-
-    <Setter Property="OverridesDefaultStyle"
-            Value="True" />
-
+  
+  <Style TargetType="TextBox"
+         x:Key="{x:Static local:AnotherWackyWidget.SearchBoxStyleKey}">
     <Setter Property="Background"
-            Value="red" />
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlBackgroundBrushKey}}" />
+    <Setter Property="Foreground"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.TextBrushKey}}" />
+    <Setter Property="BorderBrush"
+            Value="{DynamicResource {x:Static themes:ResourceKeys.ControlBorderBrushKey}}" />
     <Setter Property="BorderThickness"
             Value="{x:Static themes:ThemeConstants.ControlBorderThickness}" />
     <Setter Property="Height"
@@ -28,5 +21,5 @@
             Value="Stretch" />
     <Setter Property="Margin"
             Value="2" />
-  </Style>-->
+  </Style>
 </ResourceDictionary>

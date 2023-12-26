@@ -4,65 +4,96 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wacky="clr-namespace:MyCustomControl.Widget;assembly=MyCustomControl.Widget"
+        xmlns:themes="clr-namespace:MyCustomControl.ThemeController;assembly=MyCustomControl.ThemeController"
+        xmlns:local="clr-namespace:MyCustomControl.Demo"
         mc:Ignorable="d"
-        Title="Wacky Widget Control Demo" 
+        Title="Wacky Widget Control Demo"
         WindowStartupLocation="CenterScreen"
-        Height="450" 
-        Width="800">
+        SizeToContent="WidthAndHeight">
+  <ScrollViewer Padding="12">
+    <StackPanel>
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-    <Window.Resources>
+        <TextBlock Grid.Row="0"
+                   Text="Application scope themes: " />
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="12,4">
+          <RadioButton Content="Light global theme"
+                       Click="OnLoadLightApplicationThemeButtonClicked"
+                       IsChecked="True" />
+          <RadioButton Content="Dark global theme"
+                       Click="OnLoadDarkApplicationThemeButtonClicked"
+                       Margin="8,0" />
+        </StackPanel>
 
-        <!--<Color x:Key="{x:Static wacky:WackyWidget.CaptionForegroundColorKey}">Red</Color>
-        <SolidColorBrush x:Key="{x:Static wacky:WackyWidget.CaptionForegroundBrushKey}" 
-                     Color="{DynamicResource {x:Static wacky:WackyWidget.CaptionForegroundColorKey}}" />
+        <TextBlock Grid.Row="2"
+                   Text="Control scope themes: " />
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    Margin="12,4">
+          <RadioButton Content="Light 'WackyWidget' theme"
+                       Click="OnLoadLightWackyWidgetThemeButtonClicked" />
+          <RadioButton Content="Dark 'WackyWidget' theme"
+                       Click="OnLoadDarkWackyWidgetThemeButtonClicked"
+                       Margin="8,0" />
+          <RadioButton Content="Clear explicit 'WackyWidget' theme (application theme takes over)"
+                       Click="OnClearWackyWidgetThemeButtonClicked"
+                       Margin="8,0" />
+        </StackPanel>
 
-        <Thickness x:Key="{x:Static wacky:WackyWidget.ListBoxBorderThicknessKey}">5</Thickness>
-        <Thickness x:Key="{x:Static wacky:WackyWidget.ListBoxItemPaddingKey}">5</Thickness>
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    Margin="12,4">
+          <RadioButton Content="Light 'AnotherWackyWidget' theme"
+                       Click="OnLoadLightAnotherWackyWidgetThemeButtonClicked" />
+          <RadioButton Content="Dark 'AnotherWackyWidget' theme"
+                       Click="OnLoadDarkAnotherWackyWidgetThemeButtonClicked"
+                       Margin="8,0" />
+          <RadioButton Content="Clear explicit 'AnotherWackyWidget' theme (application theme takes over)"
+                       Click="OnClearAnotherWackyWidgetThemeButtonClicked"
+                       Margin="8,0" />
+        </StackPanel>
+      </Grid>
 
-        <Style TargetType="ListBoxItem"
-           x:Key="{x:Static wacky:WackyWidget.ListBoxItemStyleKey}" >
+      <TextBox Text="I'm a themed TextBox"
+               Background="{DynamicResource {x:Static themes:ResourceKeys.ControlBackgroundBrushKey}}"
+               Foreground="{DynamicResource {x:Static themes:ResourceKeys.TextBrushKey}}" />
 
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition />
+        </Grid.RowDefinitions>
 
-                        <Border CornerRadius="0" 
-                                Height="35"
-                                BorderBrush="Green" 
-                                BorderThickness="2" 
-                                Margin="2"
-                                Padding="{DynamicResource {x:Static wacky:WackyWidget.ListBoxItemPaddingKey}}">
+        <TextBlock Grid.Column="0"
+                   Grid.Row="0"
+                   Text="'WackyWidget' type" />
+        <wacky:WackyWidget x:Name="WackyWidgetControl"
+                           Grid.Column="0"
+                           Grid.Row="1"
+                           Caption="Enter someting to search for" />
 
-                            <ContentPresenter/>
+        <TextBlock Grid.Column="1"
+                   Grid.Row="0"
+                   Text="'AnotherWackyWidget' type" />
+        <wacky:AnotherWackyWidget x:Name="AnotherWackyWidgetControl"
+                                  Grid.Column="1"
+                                  Grid.Row="1"
+                                  Caption="Enter someting to search for" />
 
-                        </Border>
-s
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-        </Style>
-        
-        <Style TargetType="TextBlock"
-           x:Key="{x:Static wacky:WackyWidget.CaptionStyleKey}" >
-
-            <Setter Property="Foreground" Value="{StaticResource {x:Static wacky:WackyWidget.CaptionForegroundBrushKey}}"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-
-        </Style>-->
-
-    </Window.Resources>
-    
-    <Grid>
-
-        <wacky:WackyWidget Height="250"
-                           Width="400"
-                           Caption="Enter someting to search for"
-                           BorderBrush="SteelBlue"
-                           BorderThickness="1"/>
-
-    </Grid>
-    
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
 </Window>
