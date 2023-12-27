@@ -9,26 +9,26 @@
   using System.Windows.Input;
   using MyCustomControl.ThemeController;
 
-  public class WackyWidget : Control, INotifyPropertyChanged
-  {    
+  public class AnotherWackyWidget : Control, INotifyPropertyChanged
+  {
     #region Resource keys
     public static ComponentResourceKey CaptionStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "CaptionStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "CaptionStyle");
 
     public static ComponentResourceKey SearchButtonStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "SearchButtonStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "SearchButtonStyle");
 
     public static ComponentResourceKey ClearButtonStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "ClearButtonStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "ClearButtonStyle");
 
     public static ComponentResourceKey SearchBoxStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "SearchBoxStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "SearchBoxStyle");
 
     public static ComponentResourceKey ListBoxStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "ListBoxStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "ListBoxStyle");
 
     public static ComponentResourceKey ListBoxItemStyleKey =
-      new ComponentResourceKey(typeof(WackyWidget), "ListBoxItemStyle");
+      new ComponentResourceKey(typeof(AnotherWackyWidget), "ListBoxItemStyle");
     #endregion Resource keys
 
     #region Event Declarations
@@ -85,7 +85,7 @@
     public static readonly DependencyProperty CaptionProperty =
                     DependencyProperty.Register("Caption",
                     typeof(string),
-                    typeof(WackyWidget),
+                    typeof(AnotherWackyWidget),
                     new PropertyMetadata("", new PropertyChangedCallback(OnCaptionChanged)));
 
     public string Caption
@@ -96,7 +96,7 @@
 
     private static void OnCaptionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      //var control = (WackyWidget)d;
+      //var control = (AnotherWackyWidget)d;
     }
 
     #endregion
@@ -104,46 +104,23 @@
     #endregion
 
     #region Commands
-    private ICommand? _ClearCommand;
-    public ICommand ClearCommand
-    {
-      get
-      {
-        // Avoid this kind of initialization.
-        // Use the constructor instead. Consistency is key.
-        // Don't spread instance confifuration accross the type.
-        // As a bonus, initilaizing the read-only property from the constructor
-        // eliminates the backing field. See AnotherWackyWidget class for the difference.
-        if (_ClearCommand == null)
-          _ClearCommand = new RelayCommand(ClearExecuted, ClearCanExecute);
-        return _ClearCommand;
-      }
-    }
+    public ICommand ClearCommand { get; }
 
-    private ICommand? _SearchCommand;
-    public ICommand SearchCommand
-    {
-      get
-      {
-        // Avoid this kind of initialization.
-        // Use the constructor instead. Consistency is key.
-        // Don't spread instance confifuration accross the type.
-        if (_SearchCommand == null)
-          _SearchCommand = new RelayCommand(SearchExecuted, SearchCanExecute);
-        return _SearchCommand;
-      }
-    }
+    public ICommand SearchCommand { get; }
+
     #endregion
 
     #region CTOR
-    static WackyWidget()
+    static AnotherWackyWidget()
     {
-      DefaultStyleKeyProperty.OverrideMetadata(typeof(WackyWidget),
-          new FrameworkPropertyMetadata(typeof(WackyWidget)));
+      DefaultStyleKeyProperty.OverrideMetadata(typeof(AnotherWackyWidget),
+          new FrameworkPropertyMetadata(typeof(AnotherWackyWidget)));
     }
 
-    public WackyWidget()
+    public AnotherWackyWidget()
     {
+      this.SearchCommand = new RelayCommand(ExecuteSearch, CanExecuteSearch);
+      this.ClearCommand = new RelayCommand(ExecuteClear, CanExecuteClear);
       Results = new ObservableCollection<string>();
       ResultsText = string.Empty;
       SearchText = string.Empty;
@@ -153,12 +130,12 @@
 
     #region Private Methods
 
-    private bool ClearCanExecute()
+    private bool CanExecuteClear()
     {
       return !string.IsNullOrEmpty(SearchText);
     }
 
-    private void ClearExecuted()
+    private void ExecuteClear()
     {
       Results.Clear();
       ResultsText = "0 items found";
@@ -170,12 +147,12 @@
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private bool SearchCanExecute()
+    private bool CanExecuteSearch()
     {
       return !string.IsNullOrEmpty(SearchText);
     }
 
-    private void SearchExecuted()
+    private void ExecuteSearch()
     {
       for (int i = 0; i < 10; i++)
       {

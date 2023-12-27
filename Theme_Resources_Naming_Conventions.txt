@@ -1,0 +1,144 @@
+﻿** Conventions for defining default themes (themes that are deployed with the library or added during runtime) **
+=================================================================================================================
+
+This file contains valuable information in order to udertsand some important details 
+that are not apparent by reviewing the code.
+
+The theming API supports loose .xaml files, DLL files and loaded assmblies (see section "API Description" below).
+You can use the FileSystemWatcher to monitor a directory for changes. 
+For example, when a developer drops a .xaml or .DLL file into the monitored directory you can handle the event and register the
+new themes. This example does not show how to use the FileSystemWatcher.
+However, the example shows all three scenarios: register a loose .xaml file, a DLL or loaded assembly.
+
+
+File naming convention
+----------------------
+
+1. A theme dictionary file must
+    - be a .xaml file
+    - have a '<ResourceDictionary></ResourceDictionary>' as root element 
+    - use the static resource keys defined in 'MyCustomControl.ThemeController.ResourceKeys' to reference themed resources
+    - follow a strict naming convention described by the folowing schema:
+      "<optional_text>.<theme_scope>.<theme_name>.ThemeResources.xaml"
+
+      In words: the file name can start with an optional abitrary name followed by a '.' separator and a mandatory prefix (target header) that specifies the target/scope of the theme, 
+      followed by a mandatory '.' as separator character and the mandatory name of the theme, followed by a mandatory '.' separator and the mandatory ending 'ThemeResources.xaml'.
+
+      The <theme_scope> must be defined as follows:
+        * if the theme's scope is global, this prefix must be "Application"
+        * if the theme's scope is local to a control, the prefix must be the type name of that control 
+
+
+Example:
+
+The name a 'ResourceDictionary' that defines the resources for a theme named a "Summer flair" 
+and has a local scope defined by a control of type 'CustomTextBox' would look as follows:
+
+""CustomTextBox.SummerFlair.ThemeResources.xaml""
+
+The name a 'ResourceDictionary' that defines the resources for a theme named a "Night shift" 
+and has a global scope (targets all controls) would look as follows:
+
+""Application.NightShift.ThemeResources.xaml""
+
+
+File content cnvention
+----------------------
+
+The content of the actual resource file must have the following form:
+
+<ResourceDictionary>
+
+  <!-- Resource definitions -->
+  
+</ResourceDictionary>
+
+
+** API Description **
+=====================
+
+To control theming of the application, use the 'ThemeController' API (type 'MyCustomControl.ThemeController.ThemeController').
+
+Theme resources have to be registered before they can be loaded.
+This means, applying a theme requires three steps: 
+  1) Register themes
+  2) Obtain a list of registered themes 
+  3) Load a registered theme
+
+1) Register themes
+------------------
+
+The theme resources can be provided/registered in three ways:
+
+  1. Loose .xaml files:
+
+    To register such a loose file theme, 
+    use the 'ThemesResourceManager.TryRegisterThemeAsync' method 
+    and pass the 'FileInfo' of the XAML file as the argument.
+
+  2. Compiled .xaml file contained in a DLL:
+
+    To register such a compiled theme (Build Action: "Page") from a DLL, 
+    use the 'ThemesResourceManager.TryRegisterThemeAsync' method 
+    and pass the 'FileInfo' of the DLL file as the argument.
+
+  3. Compiled .xaml file embedded in an assembly:
+
+    To register such an embedded theme (Build Action: "Embedded resource") from a DLL, 
+    use the 'ThemesResourceManager.TryRegisterThemesAsync' method 
+    and pass the 'Assembly' object as the argument.
+
+
+2) Obtain a list of registered themes
+-------------------------------------
+
+To get a list of registered themes call the 'ThemesResourceManager.GetThemeInfos' method. 
+It return a list of ThemeRessourceInfo objects. 
+Use the 'ThemeRessourceInfo.ThemeName' and 'ThemeRessourceInfo.ThemeScope' properties to filter the themes.
+
+
+3) Load a registered theme
+--------------------------
+
+To load a global application level theme call the 'ThemesResourceManager.TryLoadTheme' method 
+and pass in the selected 'ResourceThemeInfo' object from 2).
+
+To load a local theme call the 'ThemesResourceManager.TryLoadThemeForControl' method 
+and pass in the selected 'ResourceThemeInfo' object from 2) 
+and the 'FrameWorkElement' that the theme should be applied to.
+
+
+** Important design considerations **
+=====================================
+
+The static resource keys for theming should be in a separate assembly, away from the actual ResourceDictionary that uses them.
+This is required for the dynamic loading of XAML files based on how XAML files and their references are compiled. 
+This is only relevant because of the 'DynamicResource' resource lookup behavior. DynamicResource reference are resolved at runtime.
+Still try to use StaticResource whenever possible.
+
+A Brush resource must reference a Color resource using StaticResource. Otherwise the result is unpredictable in scenarios where there
+are multiple reources overriding the key at different scopes.
+For example
+
+    <ListBox Background="{DynmaicResiurce {x:Static SomeColorBrush}}">
+      <ListBox.Resources>
+        <Color x:Key={x:Static SomeColorKey}>Red</Color>
+        <SolidColorBrush x:Key="{x:Static SomeColorBrush}" 
+                         Color="{StaticResource {x:Static SomeColorKey}}" />
+      </ListBox.Resources>
+    </ListBox>
+
+    App.xaml
+    <Application>
+      <Application.Resources>
+        <Color x:Key={x:Static SomeColorKey}>Blue</Color>
+        <SolidColorBrush x:Key="{x:Static SomeColorBrush}"  
+                         Color="{StaticResource {x:Static SomeColorKey}}" />
+      </Application.Resources>
+    </Application>
+
+If the 'SolidColorBrush' had referenced the 'Color' using 'DynamicResource' the 'Color' finally resolced and used by the 'ListBox' would be unpredictable.
+It could be the local value "Red" or the value from the application resources "Blue". 'StaticResource' solves this problem (no runtime lookup --> static).
+The disadvantage is that in order to customize the brush's color you must always override the 'Brush' and not the 'Color' resource.
+This is the exact same behavior that Microsoft uses for its own resource keys like 'HighlightBrushKey' and 'HighlightColorKey'.
+For this reason in my themeing example I have declared all references of 'Color' resources by 'Brush' resources as 'StaticResource'.

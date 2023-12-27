@@ -8,20 +8,20 @@ using System.Windows.Input;
 
 namespace MyCustomControl.Widget
 {
-  public class RelayCommand : ICommand
+  public class RelayCommand<TCommandParameter> : ICommand
   {
     public bool IsManualCanExecuteChangedEventEnabled { get; set; }
 
     private event EventHandler ManualCanExecuteChanged;
-    private Action ExecuteDelegate { get; }
-    private Func<bool> CanExecuteDelegate { get; }
+    private Action<TCommandParameter?> ExecuteDelegate { get; }
+    private Func<TCommandParameter?, bool> CanExecuteDelegate { get; }
 
     #region Constructors 
-    public RelayCommand(Action execute) : this(() => execute?.Invoke(), null) { }
-    public RelayCommand(Action execute, Func<bool> canExecute)
+    public RelayCommand(Action<TCommandParameter> execute) : this(execute!, null) { }
+    public RelayCommand(Action<TCommandParameter?> execute, Func<TCommandParameter?, bool>? canExecute)
     {
       this.ExecuteDelegate = execute ?? throw new ArgumentNullException(nameof(execute));
-      this.CanExecuteDelegate = canExecute ?? (() => true);
+      this.CanExecuteDelegate = canExecute ?? (commandParameter => true);
     }
 
     #endregion Constructors 
@@ -43,15 +43,15 @@ namespace MyCustomControl.Widget
     }
 
     [DebuggerStepThrough]
-    public bool CanExecute() => this.CanExecuteDelegate.Invoke();
-    public void Execute() => this.ExecuteDelegate.Invoke();
+    public bool CanExecute(TCommandParameter? parameter) => this.CanExecuteDelegate.Invoke(parameter);
+    public void Execute(TCommandParameter? parameter) => this.ExecuteDelegate.Invoke(parameter);
 
     #endregion ICommand Members 
 
     // Explicit ICommand implementation.
     // Thess methods are only visible when you explicitly cast RelayCommand to ICommand.
-    bool ICommand.CanExecute(object? parameter) => CanExecute();
-    void ICommand.Execute(object? parameter) => Execute();
+    bool ICommand.CanExecute(object? parameter) => CanExecute((TCommandParameter)parameter);
+    void ICommand.Execute(object? parameter) => Execute((TCommandParameter)parameter);
 
     public void InvalidateCommand() => OnManualCanExecuteChanged();
 
