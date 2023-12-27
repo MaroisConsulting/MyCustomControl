@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MyCustomControl.Demo"
-             StartupUri="MainWindow.xaml"
-             xmlns:themes="clr-namespace:MyCustomControl.ThemeController;assembly=MyCustomControl.ThemeController">
-  <Application.Resources>
-  </Application.Resources>
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
 </Application>
