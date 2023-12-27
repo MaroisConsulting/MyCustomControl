@@ -105,7 +105,6 @@
       string xamlFileContent = await streamReader.ReadToEndAsync();
       if (XamlConverter.TryConvertXamlContentToObject(ThemesResourceManager.CurrentAssembly, xamlFileContent, out ResourceDictionary? themeResources))
       {
-        ThemesResourceManager.RegisteredXamlFiles.Add(themeResourceXamlFileInfo.FullName);
         var themeResourceInfo = new ThemeResourceInfo(themeResourceXamlFileInfo.FullName, themeResources!);
         RegisterThemeResource(themeResourceInfo);
 
@@ -167,6 +166,7 @@
 
     private static void RegisterThemeResource(ThemeResourceInfo themeResourceInfo)
     {
+      ThemesResourceManager.RegisteredXamlFiles.Add(themeResourceInfo.XamlFilePath);
       ThemesResourceManager.RegisteredThemeResourceInfos.Add(themeResourceInfo);
       ThemesResourceManager.RegisteredThemeResourceDictionaries.Add(themeResourceInfo.ThemeResourceDictionary);
     }
