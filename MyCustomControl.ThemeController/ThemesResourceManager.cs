@@ -5,6 +5,7 @@
   using System.Collections.Generic;
   using System.Collections.ObjectModel;
   using System.ComponentModel;
+  using System.DirectoryServices;
   using System.IO;
   using System.Reflection;
   using System.Resources;
@@ -23,7 +24,6 @@
   {
     internal const string ThemeFileNameSuffix = "ThemeResources";
     internal const string ThemeFileNameTargetHeaderSeparator = ".";
-    internal const string BamlThemeResourceFileNameSuffix = $"{ThemeFileNameTargetHeaderSeparator}{ThemeFileNameSuffix}.baml";
     internal const string XamlThemeResourceFileNameSuffix = $"{ThemeFileNameTargetHeaderSeparator}{ThemeFileNameSuffix}.xaml";
 
     private static HashSet<ThemeResourceInfo> RegisteredThemeResourceInfos { get; set; }
@@ -69,14 +69,17 @@
         return false;
       }
 
-      if (await TryCollectResourceDictionaryStreamsAsync(assemblyContainingThemeResourceXamlFiles))
+      bool hasRegisteredResources = false;
+      await foreach (ResourceFinderResult<ResourceDictionary> searchResult in XamlResourceFinder.EnumerateXamlResourcesInAssemblyAsync<ResourceDictionary>(assemblyContainingThemeResourceXamlFiles, ThemesResourceManager.XamlThemeResourceFileNameSuffix))
       {
-        ThemesResourceManager.RegisteredAssemblies.Add(assemblyContainingThemeResourceXamlFiles.FullName!);
-
-        return true;
+        hasRegisteredResources |= searchResult.HasResult;
+        var themeResourceInfo = new ThemeResourceInfo(searchResult.ResourceName, searchResult.XamlObjectResource!);
+        RegisterThemeResource(themeResourceInfo);
       }
 
-      return false;
+      ThemesResourceManager.RegisteredAssemblies.Add(assemblyContainingThemeResourceXamlFiles.FullName!);
+
+      return hasRegisteredResources;
     }
 
     /// <summary>
@@ -160,88 +163,6 @@
       ApplyTheme(targetResourceDictionary, resourceInfo.ThemeResourceDictionary);
 
       return true;
-    }
-
-    private static async Task<bool> TryCollectResourceDictionaryStreamsAsync(Assembly assembly)
-    {
-      string[] resourceNames = assembly.GetManifestResourceNames();
-      bool hasFoundThemeResource = false;
-      foreach (string resourceName in resourceNames)
-      {
-        if (resourceName.EndsWith("g.resources"))
-        {
-          hasFoundThemeResource |= await TryCollectCompiledThemeResourceDictionariesAsync(assembly, resourceName);
-        }
-        // This is the place why following the file name convention,
-        // that the filename must end with ".ThemeResources.",
-        // is crucial to identifying theme files.
-        else if (resourceName.EndsWith(ThemesResourceManager.XamlThemeResourceFileNameSuffix))
-        {
-          hasFoundThemeResource |= await TryCollectEmbeddedThemeResourceDictionariesAsync(assembly, resourceName);
-        }
-      }      
-
-      return hasFoundThemeResource;
-    }
-
-    private static async Task<bool>TryCollectEmbeddedThemeResourceDictionariesAsync(Assembly assembly, string resourceName)
-    {
-      await using Stream? resourceFileStream = assembly.GetManifestResourceStream(resourceName);
-      if (resourceFileStream is null)
-      {
-        return false;
-      }
-
-      using var streamReader = new StreamReader(resourceFileStream);
-      string xamlFileContent = await streamReader.ReadToEndAsync();
-      if (XamlConverter.TryConvertXamlContentToObject(assembly, xamlFileContent, out ResourceDictionary? themeResources))
-      {
-        var themeResourceInfo = new ThemeResourceInfo(resourceName, themeResources!);
-        RegisterThemeResource(themeResourceInfo);
-
-        return true;
-      }
-
-      return false;
-    }
-
-    private static async Task<bool> TryCollectCompiledThemeResourceDictionariesAsync(Assembly assembly, string resourceName)
-    {
-      bool hasFoundThemeResource = false;
-      await using Stream? resourceStream = assembly.GetManifestResourceStream(resourceName);
-      if (resourceStream is null)
-      {
-        return false;
-      }
-
-      var resourceReader = new ResourceReader(resourceStream);
-      foreach (DictionaryEntry entry in resourceReader)
-      {
-        // This is the place why following the file name convention,
-        // that the filename must end with ".ThemeResources.",
-        // is crucial to identifying theme files.
-        if (entry.Key is string xamlResourceName
-          && xamlResourceName.EndsWith(ThemesResourceManager.BamlThemeResourceFileNameSuffix, StringComparison.OrdinalIgnoreCase))
-        {
-          var bamlStream = entry.Value as Stream;
-          var bamlReader = new Baml2006Reader(bamlStream);
-          object resource = XamlReader.Load(bamlReader);
-          if (resource is not ResourceDictionary themeResourceDictionary)
-          {
-            continue;
-          }
-
-          string xamlFileContent = XamlWriter.Save(themeResourceDictionary);
-          if (XamlConverter.TryConvertXamlContentToObject(assembly, xamlFileContent, out ResourceDictionary? themeResources))
-          {
-            hasFoundThemeResource = true;
-            var themeResourceInfo = new ThemeResourceInfo(xamlResourceName, themeResources!);
-            RegisterThemeResource(themeResourceInfo);
-          }
-        }
-      }
-
-      return hasFoundThemeResource;
     }
 
     private static void RegisterThemeResource(ThemeResourceInfo themeResourceInfo)

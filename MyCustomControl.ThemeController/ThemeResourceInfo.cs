@@ -29,6 +29,8 @@ or the target type's name (including the namespace if required.)";
 
     private void InitializeThemeInfo(string xamlFilePathWithoutFileExtension)
     {
+      /* Another location nwhere the naming convention matters */
+
       string[] fileNameParts = xamlFilePathWithoutFileExtension.Split('.');
       if (fileNameParts.Length < 3
         || !fileNameParts.Last().Equals(ThemesResourceManager.ThemeFileNameSuffix, StringComparison.InvariantCultureIgnoreCase))
