@@ -32,13 +32,20 @@ namespace MyCustomControl.Widget
     {
       add
       {
-        CommandManager.RequerySuggested += OnCommandManagerRequerySuggested;
+        if (this.ManualCanExecuteChanged is null)
+        {
+          CommandManager.RequerySuggested += OnCommandManagerRequerySuggested; 
+        }
+
         this.ManualCanExecuteChanged += value;
       }
       remove
       {
-        CommandManager.RequerySuggested -= OnCommandManagerRequerySuggested;
         this.ManualCanExecuteChanged -= value;
+        if (this.ManualCanExecuteChanged is null)
+        {
+          CommandManager.RequerySuggested -= OnCommandManagerRequerySuggested;
+        }
       }
     }
 
